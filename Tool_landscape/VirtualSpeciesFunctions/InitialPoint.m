@@ -38,7 +38,7 @@ function InfoInitialPoint = InitialPoint(ReadInfo, point, coeff)
         Distance(i) = norm(point - NormalizedClimVar(:, i))...
                       * (2 - corr2(point, NormalizedClimVar(:, i)));
     end
-
+    
     NormDistance = 1 - normalize(Distance, 2, 'range');
     [SortNormDistance, idx] = sort(NormDistance, 2, 'descend');
     

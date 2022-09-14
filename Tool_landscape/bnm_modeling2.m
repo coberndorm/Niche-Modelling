@@ -11,7 +11,7 @@ Z=in.Z;
 R=in.R;
 vars=in.Vars;
 
-T=T2(:,4:end);
+%T=T2(:,4:end);
 T=array2table(unique(T2{:,4:end},'rows'));
 Tpca=table();
 
@@ -23,9 +23,7 @@ for i=vars
 end
 Tpca.Properties.CustomProperties=Tdata.Properties.CustomProperties;
 
-%[map3,score]=predictpca(Tpca,Z,R,indicators,vars,show,outlier,outlier2);
-[map3,score]=pcaO(T2,Z,R,indicators,vars,show,false,false);
-
+[map3,score]=predictpca(Tpca,Z,R,indicators,vars,show,outlier,outlier2);
 
 in.MapPca=map3;
 in.ScorePca=score;

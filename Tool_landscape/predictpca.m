@@ -1,4 +1,4 @@
-function [template,score]=predictpca(Tin,Z,R,indicators,vars,show,outlier,outlier2)
+    function [template,score]=predictpca(Tin,Z,R,indicators,vars,show,outlier,outlier2)
 reps=size(Z);
 caps=reps(3);
 template=Z(:,:,1);
@@ -9,7 +9,7 @@ for i=1:caps
     template=Z(:,:,i);
     data(:,i)=template(:);
 end
-viable=~isnan(data(:,:));
+viable=~isnan(data(:,i));
 Tclas=table();
 for i=indicators
     eval(strcat("Tclas.bio",num2str(i),"=data(viable,i);"))
@@ -65,7 +65,6 @@ polygon=boundary(pin(:,1),pin(:,2),pin(:,3),1);
 shp=alphaShape(pin(polygon,1),pin(polygon,2),pin(polygon,3));
 clas=Tclas{:,:}*coeff(:,1:3);
 in = inShape(shp,clas(:,1),clas(:,2),clas(:,3));
-%% 
 if show
     figure('Name','Data')
     plot3(pin(:,1),pin(:,2),pin(:,3),'g.')
