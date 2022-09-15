@@ -72,7 +72,7 @@ inBounds = zeros(1,length(temp2));
 for i=1:length(newpoints)
     inBounds(i) = sum(newpoints(i)<=classifiers);
 end
-inBounds./length(classifiers)
+inBounds./(length(classifiers) - points)
 outT=[out1;out2];
 if isempty(outT)
     grap=false;
