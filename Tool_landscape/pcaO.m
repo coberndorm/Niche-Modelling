@@ -1,4 +1,4 @@
-function [bounds, coeff]=pcaO(in,show,outlier,outlier2)
+function classifiers=pcaO(in,show,outlier,outlier2)
 if nargin <3
     outlier=false;
     outlier2=false;
@@ -6,19 +6,19 @@ end
 out1=[];
 out2=[];
 T2 = in.T2;
-temp = T2{100:end,4:end};
-normalizers=[max(temp(:,:));min(temp(:,:))];
-temp(:,:)=(temp(:,:)-normalizers(2,:))./(normalizers(1,:)-normalizers(2,:));
+points = T2{:,4:end};
+normalizers=[max(points(:,:));min(points(:,:))];
+points(:,:)=(points(:,:)-normalizers(2,:))./(normalizers(1,:)-normalizers(2,:));
 
 if outlier
-    [~,~,RD,chi_crt]=DetectMultVarOutliers(temp(:,:));
+    [~,~,RD,chi_crt]=DetectMultVarOutliers(points(:,:));
     id_out=RD>chi_crt(4);
-    out1=temp{id_out,:};
-    temp=temp(~id_out,:);
+    out1=points{id_out,:};
+    points=points(~id_out,:);
 end
 
-[coeff,~,~,~,explained]=pca(temp(:,:));
-pin=temp(:,:)*coeff(:,1:3);
+[coeff,~,~,~,explained]=pca(points(:,:));
+pin=points(:,:)*coeff(:,1:3);
 
 if ~isempty(out1)
     out1=out1*coeff(:,1:3);
@@ -43,36 +43,23 @@ if show
 end
 
 boundPointsIndex = unique(nodes)
-boundPoints = temp(boundPointsIndex,:)
-points = length(boundPointsIndex);
-samples = length(temp);
-radius = zeros(points,samples);
+boundPoints = points(boundPointsIndex,:)
+pointsSize = length(boundPointsIndex);
+samples = length(points);
+radius = zeros(pointsSize,samples);
 
-for i=1:points
+for i=1:pointsSize
     for j=1:samples
-        radius(i,j)=norm(temp(boundPointsIndex(i),:)-temp(j,:));
+        radius(i,j)=norm(points(boundPointsIndex(i),:)-points(j,:));
     end
 end
 radius
-classifiers = min(radius)
+radiusClass = min(radius)
 
-temp2 = T2{1:100,4:end};
-normalizers=[max(temp2(:,:));min(temp2(:,:))];
-temp2(:,:)=(temp2(:,:)-normalizers(2,:))./(normalizers(1,:)-normalizers(2,:));
-radius2 = zeros(points,length(temp2));
-for i=1:points
-    for j=1:length(temp2)
-        radius2(i,j)=norm(temp(boundPointsIndex(i),:)-temp2(j,:));
-    end
-end
+classifiers.nodes = boundPoints;
+classifiers.index = boundPointsIndex;
+classifiers.radius = radiusClass;
 
-newpoints = min(radius2)
-inBounds = zeros(1,length(temp2));
-
-for i=1:length(newpoints)
-    inBounds(i) = sum(newpoints(i)<=classifiers);
-end
-inBounds./(length(classifiers) - points)
 outT=[out1;out2];
 if isempty(outT)
     grap=false;
