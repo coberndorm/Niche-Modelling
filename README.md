@@ -1,2 +1,1 @@
-# Niche Modeling Density Estimation
-
+# NicheModellng
