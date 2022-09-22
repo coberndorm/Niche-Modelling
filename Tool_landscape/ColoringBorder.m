@@ -1,4 +1,4 @@
-function classifiers=Coloring(in,show,outlier,outlier2,alpha)
+function classifiers=ColoringBorder(in,show,outlier,outlier2,alpha)
 if nargin <3
     outlier=false;
     outlier2=false;
@@ -93,6 +93,7 @@ classifiers.nodes = boundPoints;
 classifiers.index = boundPointsIndex;
 classifiers.radius = radiusClass;
 classifiers.normalizers = normalizers;
+classifiers.T2 = T2;
 classifiers.map = map;
 
 outT=[out1;out2];
