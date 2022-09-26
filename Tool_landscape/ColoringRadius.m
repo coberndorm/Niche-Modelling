@@ -32,12 +32,15 @@ if nargin <2
     alpha = 0;
 end
 if nargin <3
-    show = false;    
+    percentile = 0;
 end
 if nargin <4
-    outlier=false;
+    show = false;    
 end
 if nargin <5
+    outlier=false;
+end
+if nargin <6
     outlier2=false;
 end
 
