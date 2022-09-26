@@ -1,4 +1,4 @@
-function classifiers=ColoringRadius(in,alpha,show,outlier,outlier2)
+function classifiers=ColoringRadius(in,alpha,percentile,show,outlier,outlier2)
 % classifiers=ColoringRadius(in,show,outlier,outlier2,alpha)
 % 
 % DESCRIPTION 
@@ -38,7 +38,7 @@ if nargin <4
     outlier=false;
 end
 if nargin <5
-    outlier2=false:
+    outlier2=false;
 end
 
 out1=[];
@@ -105,7 +105,7 @@ for i=1:pointsSize
     end
 end
 
-radiusClass = min(radius);
+radiusClass = prctile(radius,percentile);
 radiusIndex = find(radiusClass>0);
 radiusClass = radiusClass(:,setdiff(1:end,boundPointsIndex));
 
