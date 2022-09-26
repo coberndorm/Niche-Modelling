@@ -29,7 +29,7 @@ function classifiers=ColoringRadius(in,alpha,percentile,show,outlier,outlier2)
 %%  
 
 if nargin <2
-    alpha = 1;
+    alpha = 0;
 end
 if nargin <3
     show = false;    
