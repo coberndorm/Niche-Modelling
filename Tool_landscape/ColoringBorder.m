@@ -37,7 +37,7 @@ if nargin <4
     outlier=false;
 end
 if nargin <5
-    outlier2=false:
+    outlier2=false;
 end
 %out1 and out2 will be the samples taken out by the outlier detection
 out1=[];
@@ -104,8 +104,8 @@ for i=1:pointsSize
         radius(i,j)=norm(points(boundPointsIndex(i),:)-points(j,:));
     end
 end
-radius = radius(:,setdiff(1:end,boundPointsIndex))
-radiusClass = min(radius)
+radius = radius(:,setdiff(1:end,boundPointsIndex));
+radiusClass = min(radius);
 
 response = NaN(pointsSize,length(template(:)));
 
