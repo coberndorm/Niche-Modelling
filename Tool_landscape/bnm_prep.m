@@ -54,7 +54,6 @@ else
     N = size(Z,3);
     
     for i = 1:N
-%        progressbar(i/N)
        eval(strcat('T.bio', num2str(i), '=geointerp(Z(:,:,i),R,[T.LAT],[T.LONG]);'))
     end
 end

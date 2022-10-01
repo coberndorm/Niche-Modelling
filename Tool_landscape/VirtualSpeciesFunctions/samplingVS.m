@@ -33,8 +33,10 @@ function T = samplingVS(ReadInfo, InfoInitialPoint, MapInfo, samples, factor, sh
     SortNormDistance = MapInfo.SortNormDistance;
     NormDistance = MapInfo.NormDistance;
     R = ReadInfo.R;
+    Z = ReadInfo.Z;
     idx = InfoInitialPoint.idx;
     Indicator = ReadInfo.Indicator;
+    
 
 % Sampling the niche map
     switch factor >= 0
@@ -154,4 +156,10 @@ function T = samplingVS(ReadInfo, InfoInitialPoint, MapInfo, samples, factor, sh
     T.LONG = Long;
     T.LAT = Lat;
     T.Properties.VariableNames{1} = 'Name';
+
+    N = size(Z,3);
+    
+    for i = 1:N
+       eval(strcat('T.bio', num2str(i), '=geointerp(Z(:,:,i),R,[T.LAT],[T.LONG]);'))
+    end
 end
