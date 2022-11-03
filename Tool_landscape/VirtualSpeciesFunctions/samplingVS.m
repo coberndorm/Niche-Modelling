@@ -162,4 +162,7 @@ function T = samplingVS(ReadInfo, InfoInitialPoint, MapInfo, samples, factor, sh
     for i = 1:N
        eval(strcat('T.bio', num2str(i), '=geointerp(Z(:,:,i),R,[T.LAT],[T.LONG]);'))
     end
+
+    %Delete NaN Rows
+    T(isnan(T.bio1),:) = [];
 end

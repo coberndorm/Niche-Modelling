@@ -1,14 +1,14 @@
-function [outputArg1,outputArg2] = newPoints(in,classifiers)
+function [outputArg1,outputArg2] = newPoints(T2,classifiers)
 %NEWPOINTS Summary of this function goes here
 %   Detailed explanation goes here
-T2 = in.T2;
+
 nodes = classifiers.nodes;
 classIndex = classifiers.index;
 radius = classifiers.radius;
 classSize = length(classIndex);
 points = T2{:,4:end};
 
-normalizers=[max(points(:,:));min(points(:,:))]; %duda sobre esta normalizacion
+normalizers = classifiers.normalizers;
 points(:,:)=(points(:,:)-normalizers(2,:))./(normalizers(1,:)-normalizers(2,:));
 dist = zeros(classSize,length(points));
 
