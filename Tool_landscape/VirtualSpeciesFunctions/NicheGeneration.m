@@ -17,6 +17,7 @@ function MapInfo = NicheGeneration(ReadInfo, InfoInitialPoint, Occupation, show)
 %       -SortNormDistance:
 %       -NormDistance:
 %%        
+    tic 
 
     %Reading climate variables
 
@@ -37,7 +38,6 @@ function MapInfo = NicheGeneration(ReadInfo, InfoInitialPoint, Occupation, show)
     IndexSortNorm = 1 : limit - 1;
     SortNormDistance(IndexSortNorm) = normalize(SortNormDistance(IndexSortNorm), 2, 'range');
     
-
     NormDistance(idx) = SortNormDistance;
     Map(~Indicator) = NormDistance;
     
@@ -52,5 +52,6 @@ function MapInfo = NicheGeneration(ReadInfo, InfoInitialPoint, Occupation, show)
     MapInfo.Map = Map;
     MapInfo.SortNormDistance = SortNormDistance;
     MapInfo.NormDistance = NormDistance;
+    toc
       
 end

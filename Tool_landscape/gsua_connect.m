@@ -5,6 +5,8 @@ map = ceil(pars(1));%elección de mapa
 occ = pars(2);
 nsamples = round(pars(3));
 factor = ceil(pars(4));
+alpha = pars(5);
+percentile = floor(pars(6));
 
 InfoInitialPoint = in.InfoInitialPoint{map}; %Generate a initial point to generate a niche
 MapInfo = NicheGeneration(Dimensions, InfoInitialPoint, occ, false); %Generate the niche based on the initial point
@@ -21,8 +23,8 @@ outlier2=false;%remove outliers after PCA with method in https://github.com/Anto
 %readInfo = dimensions of the map
 %alpha = shrinking factor
 
-classA = ColoringBorder(T,Dimensions,1,show,outlier,outlier2); 
-classB = ColoringRadius(T,Dimensions,1,25,show,outlier,outlier2); 
+classA = ColoringBorder(T,Dimensions,alpha,show,outlier,outlier2); 
+classB = ColoringRadius(T,Dimensions,alpha,percentile,show,outlier,outlier2); 
 data = bnm_prep(T, Dimensions, false, 0.7, false, false);
 dataf = bnm_modeling(data, '', false, 4, false);
 

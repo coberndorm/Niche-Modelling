@@ -126,6 +126,7 @@ for i=1:length(idx)
         response(j,idx(i)) = norm(points(boundPointsIndex(j),:)-data(idx(i),:));
     end
 end
+
 [intensity, minIdx] = min(response(:,idx));
 
 final = NaN(length(template(:)),1);
