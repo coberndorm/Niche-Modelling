@@ -50,6 +50,8 @@ Provide various use cases and code examples here.
 
 `write-your-code-here`
 
+## Virtual Species
+The guide for virtual species can be found in [Virtual Species Generation](https://github.com/ltorov/VirtualSpeciesGeneration) by Luisa Toro Villegas
 
 ## Project Status
 Project is: _in progress_ / _complete_ / _no longer being worked on_. If you are no longer working on it, provide reasons why.
