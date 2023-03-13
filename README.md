@@ -10,6 +10,7 @@ Advisor: Daniel Rojas Diaz
 * [Screenshots](#screenshots)
 * [Setup](#setup)
 * [Usage](#usage)
+* [Virtual Species](#virtual-species)
 * [Project Status](#project-status)
 * [Room for Improvement](#room-for-improvement)
 * [Acknowledgements](#acknowledgements)
