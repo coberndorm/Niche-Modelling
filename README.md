@@ -27,7 +27,7 @@ Advisor: Daniel Rojas Diaz
 
 This project aims to develop a nonparametric function for creating virtual species by defining their niche as a function of environmental variables. The function uses frontier depth measure to potentially solve the bias problem while maintaining accuracy in its predictions. The method is based on the use of harmonic functions to warp the space to achieve variability in the distances to a chosen initial point.
 
-The project compares the accuracy of the virtual species generated using Harmonic Functions, Scalar Coefficients, and Beta Distributions. The study finds that the Frontier Depth method generates virtual species with an accuracy of 87% on a high variability map such as South America. However, the species generated using Harmonic Functions yielded a lower average accuracy for all methods.
+The project compares the accuracy of the virtual species generated using Harmonic Functions, Scalar Coefficients, and Beta Distributions. The study finds that the Frontier Depth method generates virtual species with an accuracy of 87% on a high variability map such as South America.
 
 The project recommends further research to improve the method in various ways, such as finding the best hyperparameter p to construct the acceptance ranges or developing a heuristic method with the results of this method as a starting point.
 
