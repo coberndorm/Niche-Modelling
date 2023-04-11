@@ -1,4 +1,4 @@
-function Results = Experimentation(Dimensions, Virtual_Species_Methods, Samples, Outlier_Handling, Number_Of_Maps)
+function Results = Experimentation(Dimensions, Virtual_Species_Methods, Samples, Number_Of_Maps, Plotting)
 % This function runs an experimentation to evaluate the accuracy of two methods
 % for approximating a niche. The function generates several virtual species
 % niches and for each one, it generates a number of samples and approximates
@@ -11,18 +11,16 @@ function Results = Experimentation(Dimensions, Virtual_Species_Methods, Samples,
 %   to be used for generating the virtual species niches.
 %   Samples: A vector of three integers indicating the number of samples to be
 %   generated on each virtual species niche.
-%   Outlier_Handling: A boolean value indicating whether outlier handling should
-%   be used or not. (no se esta usando)
 %   Number_Of_Maps: The number of virtual species niches to be generated.
 
 % OUTPUTS:
-% - Results: A struct containing the accuracy results of the two methods for
+% - Results: A table containing the accuracy results of the two methods for
 %   approximating the niches.
 
-    Closest_Point_Method = zeros(length(Virtual_Species_Methods),3);
+    Closest_Point_Method = zeros(length(Virtual_Species_Methods),length(Samples));
     Percentile_Point_Method = Closest_Point_Method(:,:);
 
-    for idx = 1:3
+    for i = 1:length(Virtual_Species_Methods)
         close all, clf
     
         Acc_Results_Closest_Point_Method = zeros(length(Samples), Number_Of_Maps);
@@ -35,9 +33,9 @@ function Results = Experimentation(Dimensions, Virtual_Species_Methods, Samples,
         Show_Graphs=false;
     
         % Choosing virtual species niche generation method
-        Virtual_Species_Method = Virtual_Species_Methods(idx)
+        Virtual_Species_Method = Virtual_Species_Methods(i);
     
-        for idx1 = 1:Number_Of_Maps
+        for j = 1:Number_Of_Maps
     
             % Choosing an initial point
             Info_Initial_Point = InitialPoint(Dimensions, ...
@@ -48,9 +46,9 @@ function Results = Experimentation(Dimensions, Virtual_Species_Methods, Samples,
             Map_Info = NicheGeneration(Dimensions, Info_Initial_Point, 0.8, ...
                 Show_Graphs);
     
-            for idx2 = 1:3
+            for k = 1:length(Samples)
                 % Choosing amount of samples to generate on vritual niche
-                Number_Samples = Samples(idx2);
+                Number_Samples = Samples(k);
     
                 % Generating samples
                 T = samplingVS(Dimensions, Info_Initial_Point, Map_Info, ...
@@ -62,26 +60,51 @@ function Results = Experimentation(Dimensions, Virtual_Species_Methods, Samples,
                 classA1 = ColoringBorder(T,Dimensions,1,Show_Graphs, ...
                     Outlier_Before_PCA,Outlier_After_PCA); 
                 Accuracy_Closest_Point_Method = MapMetric(Map_Info.Map,classA1.map,false);
-                Acc_Results_Closest_Point_Method(idx2, idx1) = Accuracy_Closest_Point_Method(1);
+                Acc_Results_Closest_Point_Method(k, j) = Accuracy_Closest_Point_Method(1);
             
                 % Aproximating niche with 25 percentile closest frontier points
                 % average
                 classB1 = ColoringRadius(T,Dimensions,1,25,Show_Graphs, ...
                     Outlier_Before_PCA,Outlier_After_PCA); 
                 Accuracy_Percentile_Point_Method = MapMetric(Map_Info.Map,classB1.map,false);
-                Acc_Results_Percentile_Point_Method(idx2, idx1) = Accuracy_Percentile_Point_Method(1);
+                Acc_Results_Percentile_Point_Method(k, j) = Accuracy_Percentile_Point_Method(1);
             end
         end
 
         % Computing mean accuracy results for the two methods
-        Result_Closest_Point_Method = mean(Acc_Results_Closest_Point_Method')
-        Result_Percentile_Point_Method = mean(Acc_Results_Percentile_Point_Method')
+        Result_Closest_Point_Method = mean(Acc_Results_Closest_Point_Method');
+        Result_Percentile_Point_Method = mean(Acc_Results_Percentile_Point_Method');
 
-        Closest_Point_Method(idx,:) = Result_Closest_Point_Method;
-        Percentile_Point_Method(idx,:) = Result_Percentile_Point_Method;
+        if Plotting
+            % Create a figure with two subplots
+            figure(i);
+            samples = 'Samples = '+ string(Samples);
+            
+            % Create the first subplot
+            subplot(1,2,1);
+            plot(Acc_Results_Percentile_Point_Method');
+            title('Accuracy Percentile Point');
+            ylabel('Accuracy');
+            xlabel('Maps')
+            legend(samples)
+            
+            % Create the second subplot
+            subplot(1,2,2);
+            plot(Acc_Results_Closest_Point_Method');
+            title('Accuracy Closest Point');
+            ylabel('Accuracy');
+            xlabel('Maps')
+            legend(samples)
+
+            hold on
+         end
+
+        Closest_Point_Method(i,:) = Result_Closest_Point_Method;
+        Percentile_Point_Method(i,:) = Result_Percentile_Point_Method;
     end
 
     % Saving results for current virtual species method
-    Results.Result_Closest_Point_Method = Result_Closest_Point_Method;
-    Results.Result_Percentile_Point_Method = Result_Percentile_Point_Method;
+
+    Results.Closest_Point = array2table(Closest_Point_Method, 'RowNames',Virtual_Species_Methods, 'VariableNames', string(Samples));
+    Results.Percentile_Point = array2table(Percentile_Point_Method, 'RowNames',Virtual_Species_Methods, 'VariableNames', string(Samples));
 end
