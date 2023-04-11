@@ -28,7 +28,7 @@ function Results = Experimentation(Dimensions, Virtual_Species_Methods, Samples,
     
             for idx2 = 1:3
                 % Choosing amount of samples to generate on vritual niche
-                Number_Samples = Samples(idx2)
+                Number_Samples = Samples(idx2);
     
                 % Generating samples
                 T = samplingVS(Dimensions, Info_Initial_Point, Map_Info, ...
