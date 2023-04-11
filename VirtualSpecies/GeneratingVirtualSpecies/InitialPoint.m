@@ -31,9 +31,6 @@ function InitialPoint = InitialPoint(Layers, method, plotting, random_point, poi
 %       -SortNormDistance: an array of [1, Rows] containing the sorted
 %             distances of the layers from the initial point. 
 
-    % Start timer
-    tic
-
     % Read input data
     rows = Layers.Dimensions(1);
     layer_num = Layers.Dimensions(2);
@@ -120,8 +117,4 @@ function InitialPoint = InitialPoint(Layers, method, plotting, random_point, poi
     % Store output information
     InitialPoint.idx = idx;
     InitialPoint.SortNormDistance = sorted_norm_distance;
-    
-    % Stop timer and output elapsed time
-    toc
-
 end
