@@ -19,6 +19,9 @@ function Results = Experimentation(Dimensions, Virtual_Species_Methods, Samples,
 % - Results: A struct containing the accuracy results of the two methods for
 %   approximating the niches.
 
+    Closest_Point_Method = zeros(length(Virtual_Species_Methods),3);
+    Percentile_Point_Method = Closest_Point_Method(:,:);
+
     for idx = 1:3
         close all, clf
     
@@ -73,6 +76,9 @@ function Results = Experimentation(Dimensions, Virtual_Species_Methods, Samples,
         % Computing mean accuracy results for the two methods
         Result_Closest_Point_Method = mean(Acc_Results_Closest_Point_Method')
         Result_Percentile_Point_Method = mean(Acc_Results_Percentile_Point_Method')
+
+        Closest_Point_Method(idx,:) = Result_Closest_Point_Method;
+        Percentile_Point_Method(idx,:) = Result_Percentile_Point_Method;
     end
 
     % Saving results for current virtual species method
