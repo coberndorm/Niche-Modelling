@@ -1,4 +1,23 @@
 function Results = Experimentation(Dimensions, Virtual_Species_Methods, Samples, Outlier_Handling, Number_Of_Maps)
+% This function runs an experimentation to evaluate the accuracy of two methods
+% for approximating a niche. The function generates several virtual species
+% niches and for each one, it generates a number of samples and approximates
+% the niche using two different methods. The accuracy results of the two methods
+% are stored in a struct and returned by the function.
+
+% INPUTS:
+%   Dimensions: The number of dimensions of the niches to be generated.
+%   Virtual_Species_Methods: A vector of three strings indicating the methods
+%   to be used for generating the virtual species niches.
+%   Samples: A vector of three integers indicating the number of samples to be
+%   generated on each virtual species niche.
+%   Outlier_Handling: A boolean value indicating whether outlier handling should
+%   be used or not. (no se esta usando)
+%   Number_Of_Maps: The number of virtual species niches to be generated.
+
+% OUTPUTS:
+% - Results: A struct containing the accuracy results of the two methods for
+%   approximating the niches.
 
     for idx = 1:3
         close all, clf
@@ -50,9 +69,13 @@ function Results = Experimentation(Dimensions, Virtual_Species_Methods, Samples,
                 Acc_Results_Percentile_Point_Method(idx2, idx1) = Accuracy_Percentile_Point_Method(1);
             end
         end
+
+        % Computing mean accuracy results for the two methods
         Result_Closest_Point_Method = mean(Acc_Results_Closest_Point_Method')
         Result_Percentile_Point_Method = mean(Acc_Results_Percentile_Point_Method')
     end
 
+    % Saving results for current virtual species method
     Results.Result_Closest_Point_Method = Result_Closest_Point_Method;
     Results.Result_Percentile_Point_Method = Result_Percentile_Point_Method;
+end
