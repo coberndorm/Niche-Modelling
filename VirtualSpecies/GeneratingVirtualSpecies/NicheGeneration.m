@@ -14,9 +14,6 @@ function Map = NicheGeneration(Layers, InitialPoint, occupation, plotting)
 %       - SortNormDistance: a vector of sorted and normalized distances.
 %       - NormDistance: a vector of normalized distances.
 
-    % Start timer
-    tic 
-
     % Read climate variables
     indicator = Layers.Indicator;  % Indicator matrix
     dimension = Layers.Dimensions(1);  % Dimension of the map
@@ -52,7 +49,4 @@ function Map = NicheGeneration(Layers, InitialPoint, occupation, plotting)
     Map.Map = map;
     Map.SortNormDistance = SortNormDistance;
     Map.NormDistance = NormDistance;
-    
-    % Stop timer
-    toc      
 end
