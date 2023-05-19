@@ -57,14 +57,14 @@ function Results = Experimentation(Dimensions, Virtual_Species_Methods, Samples,
                 close all, clf
         
                 % Aproximating niche with closest frontier point method
-                classA1 = ColoringBorder(T,Dimensions,1,Show_Graphs, ...
+                classA1 = FrontierDepth(T,Dimensions,1,Show_Graphs, ...
                     Outlier_Before_PCA,Outlier_After_PCA); 
                 Accuracy_Closest_Point_Method = MapMetric(Map_Info.Map,classA1.map,false);
                 Acc_Results_Closest_Point_Method(k, j) = Accuracy_Closest_Point_Method(1);
             
                 % Aproximating niche with 25 percentile closest frontier points
                 % average
-                classB1 = ColoringRadius(T,Dimensions,1,25,Show_Graphs, ...
+                classB1 = FrontierDepthPAverage(T,Dimensions,1,25,Show_Graphs, ...
                     Outlier_Before_PCA,Outlier_After_PCA); 
                 Accuracy_Percentile_Point_Method = MapMetric(Map_Info.Map,classB1.map,false);
                 Acc_Results_Percentile_Point_Method(k, j) = Accuracy_Percentile_Point_Method(1);

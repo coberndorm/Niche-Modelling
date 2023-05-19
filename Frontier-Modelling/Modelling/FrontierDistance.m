@@ -1,8 +1,8 @@
 function classifiers=FrontierDistance(T,layerInfo,alpha,show,outlier,outlier2)
-% classifiers=ColoringRadius(in,show,outlier,outlier2,alpha)
+% classifiers=FrontierDistance(in,show,outlier,outlier2,alpha)
 % 
 % DESCRIPTION 
-%   'coloringBorder' takes species presence-data(observations) over 
+%   'FrontierDistance' takes species presence-data(observations) over 
 %   a map and generates a niche probability intensity map, by using the
 %   radius.
 %   Note: sample and point will be used interchangeably, as well as map
@@ -110,11 +110,11 @@ boundPointsIndex = unique(nodes)'; %index of the points in T
 boundPoints = points(boundPointsIndex,:); % Information of the frontier points
 pointsSize = length(boundPointsIndex); % Size of the frontier array
 
-% Array of the distance of each point to each frontier point
-radius = zeros(pointsSize,samples); 
-
 % Amount of samples
 samples = length(points);
+
+% Array of the distance of each point to each frontier point
+radius = zeros(pointsSize,samples); 
 
 % Defining an array for the final map values
 map = ones(reps(1), reps(2));
