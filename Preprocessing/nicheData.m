@@ -374,7 +374,7 @@ classdef nicheData
             contourcmap('jet',0 : 0.05 : 1, 'colorbar', 'on', 'location', 'vertical')
         end
 
-        function vecmap = map2vec(~,map)
+        function [vecmap,nanind] = map2vec(~,map)
             [rows,cols,layers] = size(map);
             vecmap = nan(rows*cols,layers);
             for i=1:layers
@@ -383,6 +383,15 @@ classdef nicheData
             end
             nanind = ~isnan(sum(vecmap,2));
             vecmap = vecmap(nanind,:);
+        end
+        function nameClusters(obj)
+            agent = obj.agents;
+            cluster = obj.clusters;
+            lAgents=length(agent);
+            for i=1:lAgents
+                disp("Cluster for Agent "+num2str(agent(i))+ " is:")
+                disp(find(cluster(i,:)))
+            end
         end
 
         function obj = insertLand(obj,Data,method,inds,thr,modelM)
@@ -421,14 +430,83 @@ classdef nicheData
             obj.Graph=G;
         end
 
-        function nameClusters(obj)
-            agent = obj.agents;
-            cluster = obj.clusters;
-            lAgents=length(agent);
-            for i=1:lAgents
-                disp("Cluster for Agent "+num2str(agent(i))+ " is:")
-                disp(find(cluster(i,:)))
+        function [Kur,G] = ricciOllivierC(obj,alpha,method)
+            G = obj.Graph;
+            switch method
+                case 'sinkhorn'
+                    nNodes = height(G.Nodes);
+                    G.Edges.Weight = G.Edges.Weight/sum(G.Edges.Weight)*height(G.Edges.Weight);
+                    Adj = full(adjacency(G,'weighted'));
+                    reg=ones(1,nNodes)*Adj;
+                    Ad = alpha*eye(nNodes)+ (1-alpha)*Adj./reg;
+                    M = distances(G);
+                    lambda=100;
+                    % the matrix to be scaled.
+                    Kur = zeros(size(Ad));
+                    disp(' ');
+                    disp(['Computing ',num2str(nNodes),' curvatures']);
+                    for i=1:(nNodes-1)
+                        adIndex = Adj(:,i)>0;
+                        adIndex2 = Ad(:,i)>0;
+                        if i>2
+                            adIndex(1:(i-1))=false;
+                        end
+                        B = Ad(:,adIndex2);
+                        adIndex3 = sum(B,2)>0;
+                        A = Ad(adIndex3,i);
+                        B = Ad(adIndex3,adIndex);
+                        if sum(adIndex)==0
+                            continue
+                        end
+                        K=exp(-lambda*M(adIndex3,adIndex3));
+                        % in practical situations it might be a good idea to do the following:
+                        K(K<1e-100)=1e-100;
+                        % pre-compute matrix U, the Schur product of K and M.
+                        U=K.*M(adIndex3,adIndex3);
+                        [D,lBound,~,~]=sinkhornTransport(A,B,K,U,lambda,[],[],[],[],0); % running with VERBOSE
+                        Kur(i,adIndex) = 1-D./M(i,adIndex);
+                        if mod(i,20)==0
+                            disp(num2str(round(i/(nNodes-1)*100,1))+"%")
+                        end
+
+                    end
+                    disp('Done computing curvatures');
+                    disp(' ');
+                    
+                otherwise
             end
         end
+
+        function obj = ricciFlow(obj,alpha,method,epsilon,flowType,iters)
+            G = obj.Graph;
+            figure(1)
+            clf
+            p = plot(G,'Marker','o','NodeColor','r','MarkerSize',3,'Layout','force');
+            layout(p,'force','WeightEffect','direct');
+            title('Iteration 0')
+            drawnow
+            for i = 1:iters
+                [Kur,G] = ricciOllivierC(obj,alpha,method);
+                auxG = graph(Kur,'upper');
+                switch flowType
+                    case 1
+                        G.Edges.Weight = G.Edges.Weight - epsilon*(auxG.Edges.Weight).*G.Edges.Weight;
+                    case 2
+                        G.Edges.Weight = G.Edges.Weight + (auxG.Edges.Weight./(abs(auxG.Edges.Weight)+epsilon)).*G.Edges.Weight;
+                    case 3
+                        G=rmedge(G,find((auxG.Edges.Weight>0.3)+(auxG.Edges.Weight<-0.3)));
+                    otherwise
+                end
+                obj.Graph = G;
+                figure(1)
+                clf
+                p = plot(G,'Marker','o','NodeColor','r','MarkerSize',3,'Layout','force');
+                layout(p,'force','WeightEffect','direct');
+                title("Iteration "+num2str(i))
+                drawnow
+            end
+
+        end
+
     end
  end
