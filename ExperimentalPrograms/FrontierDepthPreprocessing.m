@@ -1,4 +1,4 @@
-function classifiers=FrontierDepthPreprocessing(T, layerInfo, alpha, percentile, show, outlier, outlier2)
+function classifiers=FrontierDepthPreprocessing(T, layerInfo, alpha, percentile, show, outlier, outlier2, expCorrelation)
 % 
 % DESCRIPTION 
 %   'FrontierDepth' takes species presence-data(observations) over 
@@ -17,6 +17,8 @@ function classifiers=FrontierDepthPreprocessing(T, layerInfo, alpha, percentile,
 %   show: if the boundary and the estimated map will show
 %   outlier1: If the outliers are removed before normalization
 %   outlier2: a integer with the number of required samples 
+%   expCorrelation: a float with the expected explained correlation by the 
+%   remaining variables
 % 
 % OUTPUTS:
 %   classifiers.nodes: An array containing the boundary points with ther
@@ -47,14 +49,17 @@ end
 if nargin <7
     outlier2 = false;
 end
+if nargin <8
+    expCorrelation = 0.9;
+end
 %out1 and ouT will be the samples taken out by the outlier detection
 out1 = [];
 ouT = [];
 
 %Preprocessing the sample data
 niche = nicheData(T,3,4:22);
-niche = niche.aClus(0.9);
-niche = niche.regressor;
+niche = niche.aClus(expCorrelation);
+niche = niche.regressor(false);
 niche = niche.setProcFun();
 points = niche.procFun(T{:,niche.inds});
 

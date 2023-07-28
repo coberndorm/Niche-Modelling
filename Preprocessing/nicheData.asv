@@ -211,9 +211,7 @@ classdef nicheData
                 end
             end
             obj.funDat = funData;
-            if show
-                nameClusters(obj) %Cambiado por LTOROV y COBERNDORM
-            end
+            nameClusters(obj);
 
         end
 
