@@ -42,20 +42,20 @@ if nargin <5
     show = false;    
 end
 if nargin <6
-    outlier=false;
+    outlier = false;
 end
 if nargin <7
-    outlier2=false;
+    outlier2 = false;
 end
 %out1 and ouT will be the samples taken out by the outlier detection
-out1=[];
-ouT=[];
+out1 = [];
+ouT = [];
 
 %Preprocessing the sample data
-niche=nicheData(T,3,4:22);
-niche=niche.aClus(0.9);
-niche=niche.regressor;
-niche=niche.setProcFun();
+niche = nicheData(T,3,4:22);
+niche = niche.aClus(0.9);
+niche = niche.regressor;
+niche = niche.setProcFun();
 points = niche.procFun(T{:,niche.inds});
 
 %Preprocessing the map environmental data
@@ -73,27 +73,27 @@ idx = find(pointer==1);
 
 % Outlier detection before PCA
 if outlier
-    [~,~,RD,chi_crt]=DetectMultVarOutliers(points(:,:));
-    id_out=RD>chi_crt(4);
-    out1=points(id_out,:);
-    points=points(~id_out,:);
+    [~,~,RD,chi_crt] = DetectMultVarOutliers(points(:,:));
+    id_out = RD>chi_crt(4);
+    out1 = points(id_out,:);
+    points = points(~id_out,:);
 end
 
 %PCA proyection of points
-[coeff,~,~,~,~]=pca(points(:,:));
-pin=points(:,:)*coeff(:,1:3);
+[coeff,~,~,~,~] = pca(points(:,:));
+pin = points(:,:)*coeff(:,1:3);
 
 if ~isempty(out1)
-    out1=out1*coeff(:,1:3);
+    out1 = out1*coeff(:,1:3);
 end
 
 %outlier detection pos-PCA
 if outlier2
     %siz=round(size(pin,1)*0.3);
-    [~,~,RD,chi_crt]=DetectMultVarOutliers(pin);
-    id_out=RD>chi_crt(4);
-    ouT=pin(id_out,:);
-    pin=pin(~id_out,:);
+    [~,~,RD,chi_crt] = DetectMultVarOutliers(pin);
+    id_out = RD>chi_crt(4);
+    ouT = pin(id_out,:);
+    pin = pin(~id_out,:);
 end
 
 % defining the points that make up the frontier/boundary
@@ -115,7 +115,7 @@ map = ones(reps(1), reps(2));
 % Distance from each point to the frontier, including frontier points
 for j=1:samples
     for i=1:pointsSize
-        radius(i,j)=norm(points(boundPointsIndex(i),:)-points(j,:));
+        radius(i,j) = norm(points(boundPointsIndex(i),:)-points(j,:));
     end
 end
 
@@ -147,7 +147,7 @@ intensity = (intensity - min(intensity))./(max(intensity)-min(intensity));
 
 % Creating an empty array to determine each pixel's intensity
 final = NaN(length(template(:)),1);
-final(idx)=intensity;
+final(idx) = intensity;
 
 % Going back from a 1d array to a 2d array
 map(:) = final(:);
@@ -160,7 +160,7 @@ classifiers.niche = niche;
 classifiers.T = T;
 classifiers.map = map;
 
-outT=[out1;ouT];
+outT = [out1;ouT];
 
 % Plot the frontier and the coloured map
 if show
@@ -178,7 +178,7 @@ end
     
 
 if isempty(outT)
-    grap=false;
+    grap = false;
 else
-    grap=true;
+    grap = true;
 end
