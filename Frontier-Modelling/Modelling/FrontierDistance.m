@@ -87,6 +87,7 @@ if outlier
     id_out=RD>chi_crt(4);
     out1=points(id_out,:);
     points=points(~id_out,:);
+    pointSize = length(points(:,1));
 end
 
 % Dimensionality reduction to 3D with PCA
@@ -105,6 +106,7 @@ if outlier2
     id_out=RD>chi_crt(4);
     ouT=pin(id_out,:);
     pin=pin(~id_out,:);
+    pointSize = length(points(:,1));
 end
 
 % defining the points that make up the frontier/boundary

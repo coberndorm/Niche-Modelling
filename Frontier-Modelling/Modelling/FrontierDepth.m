@@ -120,7 +120,7 @@ radius = zeros(nonBoundPointsSize,boundPointsSize);
 map = NaN(reps(1), reps(2));
 
 
-% Distance from each point to the frontier, including frontier points
+% Distance from each non-frontier point to each frontier point
 for i=1:nonBoundPointsSize
     for j=1:boundPointsSize
         radius(i,j)=norm(boundPoints(j,:)-nonBoundPoints(i,:));
@@ -128,7 +128,11 @@ for i=1:nonBoundPointsSize
 end
 
 % Selecting the sample's radius as the percentile's value of the distances
-radiusClass = prctile(radius,percentile,2);
+%radiusClass = prctile(radius,percentile,2);
+
+position = ceil(nonBoundPointsSize*percentile/100);
+sortedRadius = sort(radius,2);
+radiusClass = sortedRadius(:,position);
 
 % Creating an empty array to determine each pixel's depth
 response = NaN(nonBoundPointsSize,1);
@@ -139,12 +143,12 @@ intensity = NaN(1,length(idx));
 % Calculating the depth of each map pixel with the radiusClass points
 for i=1:length(idx)
     for j=1:nonBoundPointsSize
-        response(j) = norm(nonBoundPoints(j,:)-data(idx(i),:));
+        response(j) = norm(nonBoundPoints(j,:) - data(idx(i),:));
     end
-    intensity(i) = sum(response<=radiusClass)/nonBoundPointsSize;
+    intensity(i) = sum(response <= radiusClass)/nonBoundPointsSize;
 end
 
-%intensity = (intensity - min(intensity))./(max(intensity)-min(intensity));
+intensity = (intensity - min(intensity))./(max(intensity)-min(intensity));
 
 % Creating an empty array to determine each pixel's intensity
 final = NaN(length(template(:)),1);

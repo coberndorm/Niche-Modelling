@@ -52,23 +52,23 @@ end
 if nargin <8
     expCorrelation = 0.9;
 end
-%out1 and ouT will be the samples taken out by the outlier detection
-out1 = [];
-ouT = [];
 
-%Preprocessing the sample data
+% Preprocessing the sample data
 niche = nicheData(T,3,4:22);
 niche = niche.aClus(expCorrelation);
 niche = niche.regressor(false);
 niche = niche.setProcFun();
 points = niche.procFun(T{:,niche.inds});
 
-%Preprocessing the map environmental data
+% Size of all samples
+pointSize = length(points(:,1));
+
+% Preprocessing the map environmental data
 Z = layerInfo.Z; % Enviromental Info in each point of the map
 [bio,pointer] = niche.map2vec(layerInfo.Z);
 data = niche.procFun(bio);
 
-%preparing initial important data
+% Preparing initial important data
 reps = size(Z); % Size of Z
 R = layerInfo.R; % Geographic cells Reference
 template = Z(:, :, 1); % Array of map size
@@ -85,19 +85,15 @@ if outlier
 end
 
 %PCA proyection of points
-[coeff,~,~,~,~] = pca(points(:,:));
+[coeff,~,~,~,explained] = pca(points(:,:));
 pin = points(:,:)*coeff(:,1:3);
-
-if ~isempty(out1)
-    out1 = out1*coeff(:,1:3);
-end
 
 %outlier detection pos-PCA
 if outlier2
     %siz=round(size(pin,1)*0.3);
     [~,~,RD,chi_crt] = DetectMultVarOutliers(pin);
     id_out = RD>chi_crt(4);
-    ouT = pin(id_out,:);
+    ouT = points(id_out,:);
     pin = pin(~id_out,:);
 end
 
@@ -105,67 +101,68 @@ end
 nodes = boundary(pin(:,1),pin(:,2),pin(:,3),alpha);
 boundPointsIndex = unique(nodes)'; %index of the points in T
 boundPoints = points(boundPointsIndex,:); % Information of the frontier points
-pointsSize = length(boundPointsIndex); % Size of the frontier array
+boundPointsSize = length(boundPointsIndex); % Size of the frontier array
 
-% Amount of samples
-samples = length(points);
+
+% Non-Bound Points 
+nonBoundPointsIndex = setdiff(1:pointSize,boundPointsIndex); 
+nonBoundPoints = points(nonBoundPointsIndex,:);
+nonBoundPointsSize = length(nonBoundPointsIndex); % Amount of samples
+
 
 % Array of the distance of each point to each frontier point
-radius = zeros(pointsSize,samples); 
+radius = zeros(nonBoundPointsSize,boundPointsSize); 
 
 % Defining an array for the final map values
-map = ones(reps(1), reps(2));
+map = NaN(reps(1), reps(2));
 
 
-% Distance from each point to the frontier, including frontier points
-for j=1:samples
-    for i=1:pointsSize
-        radius(i,j) = norm(points(boundPointsIndex(i),:)-points(j,:));
+% Distance from each non-frontier point to each frontier point
+for i=1:nonBoundPointsSize
+    for j=1:boundPointsSize
+        radius(i,j)=norm(boundPoints(j,:)-nonBoundPoints(i,:));
     end
 end
 
 % Selecting the sample's radius as the percentile's value of the distances
-radiusClass = prctile(radius,percentile);
+%radiusClass = prctile(radius,percentile,2);
 
-% Determining the index in T of each radius  (excludes frontier points)
-radiusIndex = find(min(radius)>0);
-
-% Deleting the frontier points from the radiusClass array
-radiusClass = radiusClass(:,setdiff(1:end,boundPointsIndex));
+position = ceil(nonBoundPointsSize*percentile/100);
+sortedRadius = sort(radius,2);
+radiusClass = sortedRadius(:,position);
 
 % Creating an empty array to determine each pixel's depth
-response = NaN(1,length(radiusClass));
+response = NaN(nonBoundPointsSize,1);
 
 % Creating an empty array to determine each pixel's depth
 intensity = NaN(1,length(idx));
 
 % Calculating the depth of each map pixel with the radiusClass points
 for i=1:length(idx)
-    for j=1:length(radiusClass)
-        response(j) = norm(points(radiusIndex(j),:)-data(i,:));
+    for j=1:nonBoundPointsSize
+        response(j) = norm(nonBoundPoints(j,:) - data(i,:));
     end
-    intensity(i) = sum(response<=radiusClass);
+    intensity(i) = sum(response <= radiusClass)/nonBoundPointsSize;
 end
 
-% Normalizing the intensity array
 intensity = (intensity - min(intensity))./(max(intensity)-min(intensity));
 
 % Creating an empty array to determine each pixel's intensity
 final = NaN(length(template(:)),1);
-final(idx) = intensity;
+final(idx)=intensity;
 
 % Going back from a 1d array to a 2d array
 map(:) = final(:);
-map(:) = final(:);
 
 classifiers.nodes = boundPoints;
-classifiers.index = radiusIndex;
+classifiers.index = nonBoundPointsIndex;
 classifiers.radius = radiusClass;
-classifiers.niche = niche;
+classifiers.preprocess = niche;
 classifiers.T = T;
 classifiers.map = map;
+classifiers.explainedPCA = explained;
 
-outT = [out1;ouT];
+
 
 % Plot the frontier and the coloured map
 if show
@@ -179,11 +176,4 @@ if show
     clf
     geoshow(map, R, 'DisplayType','surface');
     contourcmap('jet',0:0.05:1, 'colorbar', 'on', 'location', 'vertical')
-end
-    
-
-if isempty(outT)
-    grap = false;
-else
-    grap = true;
 end

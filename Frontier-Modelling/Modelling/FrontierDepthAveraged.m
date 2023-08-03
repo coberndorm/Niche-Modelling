@@ -151,7 +151,7 @@ end
 
 intensity = mean(intensity,1);
 % Normalizing the intensity array
-%intensity = (intensity - min(intensity))./(max(intensity)-min(intensity));
+intensity = (intensity - min(intensity))./(max(intensity)-min(intensity));
 
 % Creating an empty array to determine each pixel's intensity
 final = NaN(length(template(:)),1);
