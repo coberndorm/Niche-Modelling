@@ -1,4 +1,4 @@
-function classifiers=FrontierDistance(T,layerInfo,alpha,show,outlier,outlier2)
+function classifiers=HFrontierDistance(T,layerInfo,alpha,show,outlier,outlier2)
 % classifiers=FrontierDistance(in,show,outlier,outlier2,alpha)
 % 
 % DESCRIPTION 
@@ -71,11 +71,8 @@ idx = find(pointer==1);
 % Obtain the enviromental information of each sample
 points = T{:,4:end};
 
-% Size of all samples
-pointSize = length(points(:,1));
-
 % Normalizing the samples enviromental information 
-normalizers=[max(data(:,:));min(data(:,:))]; 
+normalizers=[max(points(:,:));min(points(:,:))]; 
 points(:,:)=(points(:,:)-normalizers(2,:))./(normalizers(1,:)-normalizers(2,:));
 
 % Normalizing the enviromental information of the map with the samples normalizers
@@ -111,36 +108,37 @@ end
 nodes = boundary(pin(:,1),pin(:,2),pin(:,3),alpha);
 boundPointsIndex = unique(nodes)'; %index of the points in T
 boundPoints = points(boundPointsIndex,:); % Information of the frontier points
-boundPointsSize = length(boundPointsIndex); % Size of the frontier array
+pointsSize = length(boundPointsIndex); % Size of the frontier array
 
-% Non-Bound Points 
-nonBoundPointsIndex = setdiff(1:pointSize,boundPointsIndex); 
-nonBoundPoints = points(nonBoundPointsIndex,:);
-nonBoundPointsSize = length(nonBoundPointsIndex); % Amount of samples
+% Amount of samples
+samples = length(points);
 
 % Array of the distance of each point to each frontier point
-radius = zeros(nonBoundPointsSize,boundPointsSize); 
+radius = zeros(pointsSize,samples); 
 
 % Defining an array for the final map values
-map = NaN(reps(1), reps(2));
+map = ones(reps(1), reps(2));
 
 % Distance from each point to the frontier, including frontier points
-for i=1:nonBoundPointsSize
-    for j=1:boundPointsSize
-        radius(i,j)=norm(boundPoints(j,:)-nonBoundPoints(i,:));
+for j=1:samples
+    for i=1:pointsSize
+        radius(i,j)=norm(points(boundPointsIndex(i),:)-points(j,:));
     end
 end
 
+% Deleting the frontier points from the radius array
+radius = radius(:,setdiff(1:end,boundPointsIndex));
+
 % Selecting only the minimum distance from each point to the frontier
-radiusClass = min(radius,[],2);
+radiusClass = min(radius);
 
 % Creating an empty array to determine each pixel's distance to the frontier
-response = NaN(boundPointsSize,length(template(:)));
+response = NaN(pointsSize,length(template(:)));
 
 % Calculating the distance of each map pixel to each frontier point
 for i=1:length(idx)
-    for j=1:boundPointsSize
-        response(j,idx(i)) = norm(boundPoints(j,:)-data(idx(i),:));
+    for j=1:pointsSize
+        response(j,idx(i)) = norm(points(boundPointsIndex(j),:)-data(idx(i),:));
     end
 end
 
@@ -148,18 +146,17 @@ end
 intensity = min(response(:,idx));
 
 % Creating an empty array to determine each pixel's intensity
-final = NaN(1,length(template));
+final = NaN(length(template(:)),1);
 
 % Calculating each pixel's intensity by checking if the distance to the frontier 
 % of each pixel is less than that of the samples to the frontier points
 for i=1:length(idx)
-    final(i) = sum(intensity(i)<=radiusClass)/nonBoundPointsSize;
+    final(idx(i)) = sum(intensity(i)<=radiusClass);
 end
-
-%final = (final - min(final))./(max(final)-min(final));
+final(idx) = final(idx)./(length(radiusClass));
 
 % Going back from a 1d array to a 2d array
-map(idx(:)) = final(:);
+map(:) = final(:);
 
 classifiers.nodes = boundPoints;
 classifiers.index = boundPointsIndex;
