@@ -33,6 +33,7 @@ function classifiers=FrontierDepthPreprocessing(T, layerInfo, alpha, percentile,
 %                    presence in every map pixel
 %%  
 
+warning off
 % Setting default values for alpha, show, and outlier detection
 if nargin <3
     alpha = 0;
@@ -127,9 +128,10 @@ end
 % Selecting the sample's radius as the percentile's value of the distances
 %radiusClass = prctile(radius,percentile,2);
 
-position = ceil(nonBoundPointsSize*percentile/100);
-sortedRadius = sort(radius,2);
-radiusClass = sortedRadius(:,position);
+%position = ceil(nonBoundPointsSize*percentile/100);
+%sortedRadius = sort(radius,2);
+%radiusClass = sortedRadius(:,position);
+radiusClass = min(radius,[],2);
 
 % Creating an empty array to determine each pixel's depth
 response = NaN(nonBoundPointsSize,1);
@@ -142,7 +144,7 @@ for i=1:length(idx)
     for j=1:nonBoundPointsSize
         response(j) = norm(nonBoundPoints(j,:) - data(i,:));
     end
-    intensity(i) = sum(response <= radiusClass)/nonBoundPointsSize;
+    intensity(i) = sum(response <= radiusClass); %/nonBoundPointsSize;
 end
 
 intensity = (intensity - min(intensity))./(max(intensity)-min(intensity));
