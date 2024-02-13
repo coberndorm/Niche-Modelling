@@ -117,4 +117,5 @@ function InitialPoint = InitialPoint(Layers, method, plotting, random_point, poi
     % Store output information
     InitialPoint.idx = idx;
     InitialPoint.SortNormDistance = sorted_norm_distance;
+    InitialPoint.NormDistance = norm_distance;
 end
