@@ -49,6 +49,20 @@ alpha = ((PCA_axis_b - min(PCA_axis_b)) / (max(PCA_axis_b) - min(PCA_axis_b))) *
 sample_num = 1e4;
 samples = rand(sample_num, 2) * diag([1, 2 * pi]);
 
+% Choose a middle point in the original hyperspace
+middle = ones(layer_num, 1)*0.5;
+middlePCA = [PCAs(ind(1), :);PCAs(ind(2), :)] * middle;
+
+if boo == 0
+    middle_r = (middlePCA(1) - min(PCA_axis_a)) / (max(PCA_axis_a) - min(PCA_axis_a));
+else
+    middle_r = (middlePCA(1) - max(PCA_axis_a)) / (min(PCA_axis_a) - max(PCA_axis_a));
+end
+
+middle_alpha = ((middlePCA(2) - min(PCA_axis_b)) / (max(PCA_axis_b) - min(PCA_axis_b))) * 2 * pi;
+
+samples(1,:) = [middle_r, middle_alpha];
+
 % Generate harmonic functions for each point in the grid and calculate the distance from the center
 H = HarmonicFunction(samples, deformations_limit, plotting);
 distances = H.Distances;
